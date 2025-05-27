@@ -33,7 +33,7 @@
           <select th:field="*{memberIds}">
             <option value="">チャットするユーザーを選択してください</option>
             <div th:each="user : ${users}">
-              <option th:text="${user.name}" th:text="${user.name}"></option>
+              <option th:value="${user.id}" th:text="${user.name}" ></option>
             </div>
           </select>  
           <input type="hidden" th:value="${#authentication?.principal.id}" th:name="memberIds" />

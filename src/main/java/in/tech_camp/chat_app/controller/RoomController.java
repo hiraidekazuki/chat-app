@@ -11,6 +11,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import in.tech_camp.chat_app.custom_user.CustomUserDetail;
@@ -77,8 +78,14 @@ public class RoomController {
       model.addAttribute("roomForm", new RoomForm());
       return "rooms/new";
     }
-  
-    
+
+    return "redirect:/";
+  }
+
+  @PostMapping("/rooms/{roomId}/delete")
+  public String deleteRoom(@PathVariable Integer roomId) {
+     // ① 引数の roomId を使って、rooms テーブルから該当のルームを削除するメソッドを呼び出している
+    roomRepository.deleteById(roomId);
     return "redirect:/";
   }
 }

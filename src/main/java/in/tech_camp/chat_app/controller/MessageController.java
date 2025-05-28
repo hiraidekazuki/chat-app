@@ -48,6 +48,9 @@ public class MessageController {
     model.addAttribute("messageForm", new MessageForm());
     //model は「ビューに渡すデータの入れ物」 addAttribute は「モデルに属性（データ）を追加するメソッド」 "messageForm" はビュー（テンプレート）側で使う名前（キー） new MessageForm() は 空のメッセージ送信用のフォームオブジェクトを作って渡している
     model.addAttribute("roomId", roomId);
+
+    List<MessageEntity> messages = messageRepository.findByRoomId(roomId);
+    model.addAttribute("messages", messages);
     return "messages/index";
   }
    @PostMapping("/rooms/{roomId}/messages")

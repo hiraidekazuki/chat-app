@@ -29,20 +29,16 @@
           おはよう
         </div>
       </div>
-    </div>
+
 
     <div class="message">
-      <div class="upper-message">
-        <div class="message-user">
-          Tom
+      <div th:each="message : ${messages}" class="message">
+       <div class="upper-message">
+         <div class="message-user" th:text="${message.user.name}">ユーザー名</div>
+         <div class="message-date" th:text="${message.createdAt}">日付</div>
         </div>
-        <div class="message-date">
-          2020/3/31(Wed) 12:47:30
-        </div>
-      </div>
-      <div class="lower-message">
-        <div class="message-content">
-          こんばんは
+       <div class="lower-message">
+         <div class="message-content" th:text="${message.content}">メッセージ内容</div>
         </div>
       </div>
     </div>
@@ -50,7 +46,7 @@
 
   <form th:action="@{/rooms/{roomId}/messages(roomId=${roomId})}" method="post" th:object="${messageForm}" class="form">
     <div class="form-input">
-      <input th:field="*{content}" class="form-message" placeholder= "type a message">
+      <input  class="form-message" placeholder= "type a message">
       <label class="form-image">
         <span class="image-file">画像</span>
         <input type="file" class="hidden">

@@ -38,17 +38,24 @@ public class MessageController {
   @GetMapping("/rooms/{roomId}/messages")  
   //Spring MVCが(つまりこの時点で)MessageFormクラスの新しいインスタンスを生成し、リクエストの中のデータを「セットする＝(コピー)」
   public String showMessages(@PathVariable("roomId") Integer roomId,@AuthenticationPrincipal CustomUserDetail currentUser, Model model){
+    // 現在ログイン中のユーザー情報
     UserEntity user = userRepository.findById(currentUser.getId());
+    // そのユーザーが参加している全ルームの一覧
     List<RoomUserEntity> roomUserEntities = roomUserRepository.findByUserId(currentUser.getId());
     List<RoomEntity> roomList = roomUserEntities.stream()
         .map(RoomUserEntity::getRoom)
         .collect(Collectors.toList());
     model.addAttribute("user", user);
     
+    // メッセージ送信フォーム用の空オブジェクト
     model.addAttribute("messageForm", new MessageForm());
     //model は「ビューに渡すデータの入れ物」 addAttribute は「モデルに属性（データ）を追加するメソッド」 "messageForm" はビュー（テンプレート）側で使う名前（キー） new MessageForm() は 空のメッセージ送信用のフォームオブジェクトを作って渡している
-    model.addAttribute("roomId", roomId);
+   
+   // 現在表示中のルーム
+    RoomEntity room = roomRepository.findById(roomId);
+    model.addAttribute("room", room);
 
+    // 現在表示中のルームに属するメッセージ一覧
     List<MessageEntity> messages = messageRepository.findByRoomId(roomId);
     model.addAttribute("messages", messages);
     return "messages/index";

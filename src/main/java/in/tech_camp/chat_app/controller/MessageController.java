@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -62,7 +63,12 @@ public class MessageController {
   }
    @PostMapping("/rooms/{roomId}/messages")
    //送られてきたリクエストから、IDを抜き出す。
-  public String saveMessage(@PathVariable("roomId") Integer roomId, @ModelAttribute("messageForm") MessageForm messageForm, @AuthenticationPrincipal CustomUserDetail currentUser) {
+  public String saveMessage(@PathVariable("roomId") Integer roomId, @ModelAttribute("messageForm") MessageForm messageForm, BindingResult bindingResult, @AuthenticationPrincipal CustomUserDetail currentUser) {
+    
+    if (bindingResult.hasErrors()) {
+      return "redirect:/rooms/" + roomId + "/messages";
+    }
+    
     MessageEntity message = new MessageEntity();
     //送られてきたデータを一時保存していたメッセージフォームからコンテンツをゲットして、隣にぶち込む。
     message.setContent(messageForm.getContent());

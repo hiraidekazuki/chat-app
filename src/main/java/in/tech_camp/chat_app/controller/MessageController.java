@@ -73,6 +73,7 @@ public class MessageController {
    @PostMapping("/rooms/{roomId}/messages")
    //送られてきたリクエストから、IDを抜き出す。
   public String saveMessage(@PathVariable("roomId") Integer roomId, @ModelAttribute("messageForm") MessageForm messageForm, BindingResult bindingResult, @AuthenticationPrincipal CustomUserDetail currentUser) {
+    messageForm.validateMessage(bindingResult);
     
     if (bindingResult.hasErrors()) {
       return "redirect:/rooms/" + roomId + "/messages";

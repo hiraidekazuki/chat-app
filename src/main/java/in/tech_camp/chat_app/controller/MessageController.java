@@ -82,13 +82,17 @@ public class MessageController {
     //送られてきたデータを一時保存していたメッセージフォームからコンテンツをゲットして、隣にぶち込む。
     message.setContent(messageForm.getContent());
 
-     //画像の保存
+     //フォームから入力された情報から画像イメージだけを取り出し、代入
      MultipartFile imageFile = messageForm.getImage();
     if (imageFile != null && !imageFile.isEmpty()) {
       try {
+        //設定プロパティクラスのgetImageメソッドを呼び出し、代入する
         String uploadDir = imageUrl.getImageUrl();
+        //画像ファイルに名前をつけている
         String fileName = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) + "_" + imageFile.getOriginalFilename();
+        //右辺では取得した画像urlとファイル名を合わせて取得し、パスを作成。それをイメージパスに代入している。
         Path imagePath = Paths.get(uploadDir, fileName);
+        //イメージファイルとイメージパスを合わせて、コピー
         Files.copy(imageFile.getInputStream(), imagePath);
         message.setImage("/uploads/" + fileName);
       } catch (IOException e) {

@@ -40,11 +40,14 @@
        <div class="lower-message">
          <div class="message-content" th:text="${message.content}">メッセージ内容</div>
         </div>
+       <div th:if="${message.image}">
+         <img th:src="@{${message.image}}" alt="メッセージ画像" style="width: 500px; height: 500px;"/>
+       </div>
       </div>
     </div>
   </div>
 
-  <!-- MultipartFile-->
+  <!-- MultipartFileがあることでイメージファイルを使いますという宣言になる-->
   <form th:action="@{/rooms/{roomId}/messages(roomId=${room.id})}" method="post" th:object="${messageForm}" class="form" enctype="multipart/form-data">
     <div class="form-input">
       <input  class="form-message" placeholder= "type a message">

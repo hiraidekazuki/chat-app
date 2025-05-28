@@ -1,5 +1,11 @@
 package in.tech_camp.chat_app.controller;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,7 +17,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.multipart.MultipartFile;
 
+import in.tech_camp.chat_app.ImageUrl;
 import in.tech_camp.chat_app.custom_user.CustomUserDetail;
 import in.tech_camp.chat_app.entity.MessageEntity;
 import in.tech_camp.chat_app.entity.RoomEntity;
@@ -35,6 +43,7 @@ public class MessageController {
 
   private final MessageRepository messageRepository;
 
+  private final ImageUrl imageUrl;
 
   @GetMapping("/rooms/{roomId}/messages")  
   //Spring MVCが(つまりこの時点で)MessageFormクラスの新しいインスタンスを生成し、リクエストの中のデータを「セットする＝(コピー)」
@@ -64,6 +73,7 @@ public class MessageController {
    @PostMapping("/rooms/{roomId}/messages")
    //送られてきたリクエストから、IDを抜き出す。
   public String saveMessage(@PathVariable("roomId") Integer roomId, @ModelAttribute("messageForm") MessageForm messageForm, BindingResult bindingResult, @AuthenticationPrincipal CustomUserDetail currentUser) {
+    messageForm.validateMessage(bindingResult);
     
     if (bindingResult.hasErrors()) {
       return "redirect:/rooms/" + roomId + "/messages";
@@ -72,6 +82,25 @@ public class MessageController {
     MessageEntity message = new MessageEntity();
     //送られてきたデータを一時保存していたメッセージフォームからコンテンツをゲットして、隣にぶち込む。
     message.setContent(messageForm.getContent());
+
+     //フォームから入力された情報から画像イメージだけを取り出し、代入
+     MultipartFile imageFile = messageForm.getImage();
+    if (imageFile != null && !imageFile.isEmpty()) {
+      try {
+        //設定プロパティクラスのgetImageメソッドを呼び出し、代入する
+        String uploadDir = imageUrl.getImageUrl();
+        //画像ファイルに名前をつけている
+        String fileName = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) + "_" + imageFile.getOriginalFilename();
+        //右辺では取得した画像urlとファイル名を合わせて取得し、パスを作成。それをイメージパスに代入している。
+        Path imagePath = Paths.get(uploadDir, fileName);
+        //イメージファイルとイメージパスを合わせて、コピー
+        Files.copy(imageFile.getInputStream(), imagePath);
+        message.setImage("/uploads/" + fileName);
+      } catch (IOException e) {
+        System.out.println("エラー：" + e);
+        return "redirect:/rooms/" + roomId + "/messages";
+      }
+    }
 
     //誰がコメントをしたのかを保存したいので各リポジトリからIDを取ってきて、セットしている。
     UserEntity user = userRepository.findById(currentUser.getId());

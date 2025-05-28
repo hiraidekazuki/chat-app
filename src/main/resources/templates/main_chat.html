@@ -50,7 +50,7 @@
   <!-- MultipartFileがあることでイメージファイルを使いますという宣言になる-->
   <form th:action="@{/rooms/{roomId}/messages(roomId=${room.id})}" method="post" th:object="${messageForm}" class="form" enctype="multipart/form-data">
     <div class="form-input">
-      <input  class="form-message" placeholder= "type a message">
+      <input  class="form-message" th:field ="*{content}" placeholder= "type a message">
       <label class="form-image">
         <span class="image-file">画像</span>
         <input type="file" th:field="*{image}" class="hidden">

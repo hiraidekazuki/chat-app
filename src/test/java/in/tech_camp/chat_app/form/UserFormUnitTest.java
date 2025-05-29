@@ -29,10 +29,12 @@ public class UserFormUnitTest {
 
   private BindingResult bindingResult;
 
+  //毎回処理を行うところ
   @BeforeEach
   public void setUp() {
     userForm = UserFormFactory.createUser();
 
+    // 工場で作った検査官（Validator）を取り出す＝// 工場を建てる（Validationという設計図で）
     ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     validator = factory.getValidator();
 
@@ -43,6 +45,7 @@ public class UserFormUnitTest {
   class ユーザーを作成できる場合 {
     @Test
     public void nameとemailとpasswordとpasswordconfirmationが存在すれば登録できる () {
+      //ビーフォアイーチのバリデーターからバリデートを呼び出す指示。()のなかはそれがユーザーフォームのバリデーション1のクラスを振られたやつということを示している。これを左辺にぶち込む。
       Set<ConstraintViolation<UserForm>> violations = validator.validate(userForm, ValidationPriority1.class);
       assertEquals(0, violations.size());
     }
@@ -101,7 +104,9 @@ public class UserFormUnitTest {
 
      @Test
     public void passwordとpasswordConfirmationが不一致では登録できない() {
+      // ✅ フォームの確認用パスワードだけを意図的に変更（不一致状態を作る）
       userForm.setPasswordConfirmation("differentPassword");
+      // ✅ 独自のバリデーションメソッドを呼び出し（内部で比較し、エラーを追加する）
       userForm.validatePasswordConfirmation(bindingResult);
       verify(bindingResult).rejectValue("passwordConfirmation", "error.user", "Password confirmation doesn't match Password");
     }
